@@ -17,10 +17,8 @@ Options:
   -H --no-host  Do NOT set the hostname
   -D --no-dns   Do NOT set up the DNS
   -S --screen-only
-                Only print the hostname to the screen,
-                implies --no-host and --no-dns
-  -P --public   Use the public IP instead of the private
-                (default)
+                Only print the hostname to the screen, implies --no-host and --no-dns
+  -P --public   Use the public IP instead of the private (default)
   -1            Use the last part of the IP only
   -2            Use the last 2 parts
   -3            Use the last 3 parts

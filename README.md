@@ -28,10 +28,10 @@ We've written a number of scripts that may make your life easier.
 ### dynamic\_hostname
 Sets the hostname based on
 
- # The private-ip (or public ip) of the instance
- # The `Domain` tag
- # The `aws:autoscaling:groupName` tag
- # The `Name` tag
+ * The private-ip (or public ip) of the instance
+ * The `Domain` tag
+ * The `aws:autoscaling:groupName` tag
+ * The `Name` tag
 
 Once the hostname is determined, sets the hostname via the hostname command,
 and registers the hostname in Route53. Can also wait for the record to be
