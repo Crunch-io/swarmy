@@ -7,6 +7,11 @@ RUN apt-get update -q && apt-get upgrade -qy && apt-get install -qy python-softw
 
 USER root
 WORKDIR /root
+ADD .aws/credentials .aws/credentials
+
 ADD bootstrap-ubuntu.sh bootstrap.sh
+
+
+ADD ./ swarmy/
 
 CMD /root/bootstrap.sh ; /bin/bash -l
