@@ -37,6 +37,7 @@ setup(
     author_email='dev@crunch.io',
     license='MIT',
     install_requires=[
+        'awscli',
         'boto',
         'docopt',
     ],
