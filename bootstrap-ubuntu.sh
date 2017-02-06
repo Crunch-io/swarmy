@@ -1,13 +1,18 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 #Settings needed to bootstrap and load settings
 GIT_BRANCH=${GIT_BRANCH:-master}
-PIP_ARGS=""
-SETTINGS_URL=""
+#PIP_ARGS=""
+#SETTINGS_URL=""
 
 # Can be set here, or loaded from s3 settings
-NEXT_SCRIPT=${NEXT_SCRIPT:-scripts/stage2.sh}
+NEXT_SCRIPT=""
 DEBUG=true
+
+if [ -n "$DEBUG" ]; then
+    set -x
+    printenv
+fi
 
 #Other ENV Args useful for pre-tasks
 DEBIAN_FRONTEND=noninteractive
@@ -44,7 +49,7 @@ function download_next
       s3://*)
         #Download the script, set perms, and then execute
         # AWSCLI is a req of swarmy and is installed during setup.py develop above
-        aws s3 cp $1 $OUT
+        aws s3 cp --quiet $1 $OUT > /dev/null 2>&1
         ;;
       http*://*)
         #Download the script using curl, then execute
@@ -59,22 +64,26 @@ function download_next
 }
 
 # Load environment settings from URL
-SETTINGS_URL=${SETTINGS_URL:-s3://crunchio-autoscale/.profile}
+if [ -n "$SETTINGS_URL" ]; then
+    SSS=$(download_next $SETTINGS_URL .profile)
 
-SSS=$(download_next $SETTINGS_URL .profile)
+    set +e
 
-set +e
+    source $SSS
 
-source $SSS
-
-#clean up
-if [ -z "$DEBUG" ]; then
-    rm -f $SSS
+    #clean up
+    if [ -z "$DEBUG" ]; then
+        rm -f $SSS
+    fi
+    set -e
+else
+    if [ -n "$DEBUG" ]; then
+        echo "No settings file provided."
+    fi
 fi
-set -e
 
 # Call the next script
-if [ -f $NEXT_SCRIPT ]; then
+if [ -n "$NEXT_SCRIPT" ]; then
     SCRIPT=$(download_next $NEXT_SCRIPT .stage2.sh)
     chmod a+x $SCRIPT
 
