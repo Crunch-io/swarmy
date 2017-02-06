@@ -20,16 +20,23 @@ script instead.
  * `GIT_BRANCH`: specify this variable to check out a swarmy branch other than master
  * `NEXT_SCRIPT`: Specify this variable to change which script gets run next. It can point to something on the instance, or something inside this repo, or even something on S3 or https.
  * `HOSTNAME_ARGS`: The arguments to pass to `dynamic_hostname` (described below). You must provide at least the `--domain` or `--domain-tag` argument.
- * `USE_IAM`: If you launch your instances with an IAM Role (Highly Recommended), it will be used instead of credentials, even if provided. (Do we want this?)
 
 ### Sample S3 profile to load these and other environment variables from S3
-Set the SETTINGS_URL environment variable in the bootstrap script to load and source a file from s3. This should be formatted like a s3 url used by `aws s3` commands (e.g., s3://crunchio-autoscale/settings.profile)
+Set the SETTINGS_URL environment variable in the bootstrap script to load and
+source a file locally, over http(s), or from s3. For s3 retrieval this should
+be formatted like a s3 url used by `aws s3` commands (e.g.,
+s3://crunchio-autoscale/settings.profile)
 
 ```shell
+# Treat like a .profile ...
 NEXT_SCRIPT=${NEXT_SCRIPT:-stage2.sh}
 HOSTNAME_ARGS=${HOSTNAME_ARGS:-"-2 --domain-tag=Domain --prefix-tag=aws:autoscaling:groupName"}
 JENKINS_BASE=${JENKINS_BASE:-https://ci.crunch.io/}
 ```
+
+Note that for S3 settings, the instance must be defined with an IAM role, or
+the bootstrap script must otherwise set up credentials to make the AWS API
+request.
 
 ## Scripts Available
 We've written a number of scripts that may make your life easier.
@@ -47,7 +54,9 @@ and registers the hostname in Route53. Can also wait for the record to be
 propagated before exiting.
 
 ### trigger\_jenkins\_job (TODO)
-Calls the Jenkins API to trigger some sort of action. (Used instead of Lambda, for example).
+Calls the Jenkins API to trigger some sort of action. (Used instead of Lambda,
+for example).
 
 ### update\_launch\_configuration (TODO)
-Updates the specified launch configuration with: the latest AMI image in a series, the latest bootstrap.sh metadata, etc.
+Updates the specified launch configuration with: the latest AMI image in a
+series, the latest bootstrap.sh metadata, etc.
