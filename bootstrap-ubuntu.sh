@@ -3,10 +3,10 @@
 #Settings needed to bootstrap and load settings
 GIT_BRANCH=${GIT_BRANCH:-master}
 PIP_ARGS=""
-SETTINGS_URL=s3://crunchio-autoscale/bootstrap_ubuntu.profile
+SETTINGS_URL=""
 
 # Can be set here, or loaded from s3 settings
-NEXT_SCRIPT=${NEXT_SCRIPT:-stage2.sh}
+NEXT_SCRIPT=${NEXT_SCRIPT:-scripts/stage2.sh}
 DEBUG=true
 
 #Other ENV Args useful for pre-tasks
@@ -59,25 +59,19 @@ function download_next
 }
 
 # Load environment settings from URL
-if [ -n "$SETTINGS_URL" ]; then
-    SETTINGS_URL=${BUCKET_URL:-s3://crunchio-autoscale/.profile}
+SETTINGS_URL=${SETTINGS_URL:-s3://crunchio-autoscale/.profile}
 
-    SSS=$(download_next $SETTINGS_URL .profile)
+SSS=$(download_next $SETTINGS_URL .profile)
 
-    set +e
+set +e
 
-    source $SSS
+source $SSS
 
-    #clean up
-    if [ -z "$DEBUG" ]; then
-        rm -f $SSS
-    fi
-    set -e
-else
-    if [ -n "$DEBUG" ]; then
-        echo "No settings sourced."
-    fi
+#clean up
+if [ -z "$DEBUG" ]; then
+    rm -f $SSS
 fi
+set -e
 
 # Call the next script
 if [ -f $NEXT_SCRIPT ]; then
