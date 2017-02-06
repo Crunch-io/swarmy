@@ -17,10 +17,19 @@ There are a number of variables that will affect the behavior of the canned
 bootstrap.sh script. Of course you are free to provide your own bootstrap
 script instead.
 
- * `GIT_BRANCH`: specify this variable to check out a branch other than master
- * `NEXT_SCRIPT`: Specify this variable to change which script gets run next. It can point to something on the instance, or something inside this repo.
+ * `GIT_BRANCH`: specify this variable to check out a swarmy branch other than master
+ * `NEXT_SCRIPT`: Specify this variable to change which script gets run next. It can point to something on the instance, or something inside this repo, or even something on S3 or https.
  * `HOSTNAME_ARGS`: The arguments to pass to `dynamic_hostname` (described below). You must provide at least the `--domain` or `--domain-tag` argument.
  * `USE_IAM`: If you launch your instances with an IAM Role (Highly Recommended), it will be used instead of credentials, even if provided. (Do we want this?)
+
+### Sample S3 profile to load these and other environment variables from S3
+Set the SETTINGS_URL environment variable in the bootstrap script to load and source a file from s3. This should be formatted like a s3 url used by `aws s3` commands (e.g., s3://crunchio-autoscale/settings.profile)
+
+```shell
+NEXT_SCRIPT=${NEXT_SCRIPT:-stage2.sh}
+HOSTNAME_ARGS=${HOSTNAME_ARGS:-"-2 --domain-tag=Domain --prefix-tag=aws:autoscaling:groupName"}
+JENKINS_BASE=${JENKINS_BASE:-https://ci.crunch.io/}
+```
 
 ## Scripts Available
 We've written a number of scripts that may make your life easier.
