@@ -1,33 +1,41 @@
-#!/bin/bash -e
+#!/bin/bash
+
+# The output from this script is found in the instance
+# system log available through the AWS API, or the
+# console.
+
+set -e
+cd /root
 
 #Settings needed to bootstrap and load settings
-GIT_BRANCH=${GIT_BRANCH:-master}
+#TODO: GIT_BRANCH=${GIT_BRANCH:-master}
 #PIP_ARGS=""
 #SETTINGS_URL=""
+#DEBUG=true
 
 # Can be set here, or loaded from s3 settings
-NEXT_SCRIPT=""
-DEBUG=true
+NEXT_SCRIPT=${NEXT_SCRIPT:-""}
 
 if [ -n "$DEBUG" ]; then
     set -x
-    printenv
+    #printenv
 fi
 
 #Other ENV Args useful for pre-tasks
 DEBIAN_FRONTEND=noninteractive
 
 #Update all local packages
-apt-get update -q && apt-get upgrade -qy
+apt-get -q update && apt-get -q upgrade -y
 
 #First set up a list of packages to install
-PKGS="python-virtualenv curl"
+PKGS="python-virtualenv curl libyaml-dev python-dev"
 
-apt-get install -qy $PKGS
+apt-get -q install -y $PKGS
 
 #Create a virtualenv
 virtualenv VENV
 . VENV/bin/activate
+#The activate script disables our logging
 
 if [ ! -d swarmy ]
 then
@@ -37,6 +45,7 @@ fi
 
 cd swarmy
 python setup.py develop $PIP_ARGS
+cd /root
 
 function download_next
 {
@@ -85,9 +94,8 @@ fi
 # Call the next script
 if [ -n "$NEXT_SCRIPT" ]; then
     SCRIPT=$(download_next $NEXT_SCRIPT .stage2.sh)
-    chmod a+x $SCRIPT
 
-    $SCRIPT
+    source $SCRIPT
 
     if [ -z "$DEBUG" ]; then
         rm -f $SCRIPT
@@ -98,3 +106,4 @@ else
     fi
 fi
 
+echo "Bootstrap script finished" >> /root/cloud-init-bootstrap.log
