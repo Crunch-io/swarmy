@@ -35,7 +35,6 @@ apt-get -q install -y $PKGS
 #Create a virtualenv
 virtualenv VENV
 . VENV/bin/activate
-#The activate script disables our logging
 
 if [ ! -d swarmy ]
 then
