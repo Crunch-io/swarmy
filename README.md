@@ -47,14 +47,13 @@ As part of that IAM role, if you wish to set up DNS, you'll need a policy that g
 
 A full policy might look like this:
 
-```json
-# Note 1: break this up into several distinct policies to ease reuse
-# Note 2: Remove comments before using in the Policy editor
+```javascript
+// Note 1: break this up into several distinct policies to ease reuse
+// Note 2: Remove comments before using in the Policy editor
 {
     "Version": "2012-10-17",
     "Statement": [
-        # This allows tag listing and creation on instances in a given
-        # region
+        // This allows tag listing and creation on instances in a given region
         {
             "Effect": "Allow",
             "Action": [
@@ -64,8 +63,9 @@ A full policy might look like this:
             ],
             "Resource": "arn:aws:ec2:eu-west-1:910774676937:instance/*"
         },
-        # The next section adds rights to read any ec2 data (useful for
-        # retrieving scaling group and instance info)
+        /* The next section adds rights to read any ec2 data (useful for
+           retrieving scaling group and instance info)
+          */
         {
           "Effect": "Allow",
           "Action": "ec2:Describe*",
@@ -90,7 +90,7 @@ A full policy might look like this:
           "Action": "autoscaling:Describe*",
           "Resource": "*"
         },
-        # Rights to update route53 for a specific zone
+        // Rights to update route53 for a specific zone
         {
             "Action": [
                 "route53:ChangeResourceRecordSets",
@@ -102,7 +102,7 @@ A full policy might look like this:
                 "arn:aws:route53:::hostedzone/Z2L387X0621IN6"
             ]
         },
-        # Also need to be able to enumerate all the zones
+        // Also need to be able to enumerate all the zones
         {
             "Action": [
                 "route53:ListHostedZones"
@@ -112,9 +112,10 @@ A full policy might look like this:
                 "*"
             ]
         },
-        # Allow read only access to the s3 bucket that will contain
-        # additional secrets for enabling access to software repos, or web
-        # callback to trigger additional setup/configuration
+        /* Allow read only access to the s3 bucket that will contain
+           additional secrets for enabling access to software repos, or web
+           callback to trigger additional setup/configuration
+          */
         {
             "Effect": "Allow",
             "Action": [
