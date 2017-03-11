@@ -16,9 +16,11 @@ Options:
   -D --debug    Print some debugging
   -H --no-host  Do NOT set the hostname
   -D --no-dns   Do NOT set up the DNS
+  -N --no-ec2-name
+                Do NOT add the new hostname as the "Name" tag on the instance
   -S --screen-only
                 Only print the hostname to the screen, implies --no-host and --no-dns
-  -P --public   Use the public IP instead of the private (default)
+  -P --public   Use the public IP instead of the private (Private ip is used by default)
   -1            Use the last part of the IP only
   -2            Use the last 2 parts
   -3            Use the last 3 parts
@@ -123,6 +125,9 @@ def main():
 
         if not arguments['--no-host']:
             lib.set_hostname(fqdn)
+
+        if not arguments['--no-ec2-name']:
+            lib.set_instance_name(fqdn)
 
     if not arguments['-q']:
         print fqdn

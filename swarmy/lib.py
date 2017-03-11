@@ -59,6 +59,28 @@ def get_instance_tags():
         _i_tags = inst.tags
     return _i_tags
 
+@metadata_required
+def set_instance_tag(key, value):
+    global _i_metadata, _i_tags
+    '''
+    Set's the instance tag for the current instance id/region retrieved from
+    metadata.
+
+    '''
+    instanceId = _i_metadata['instance-id']
+    #assumes that the availability zone is a single character at the end of the region
+    region = get_region()
+
+    ec2conn = boto.ec2.connect_to_region(region)
+    res = ec2conn.get_all_instances(instance_ids=[instanceId])
+    inst = res[0].instances[0]
+    inst.add_tag(key, value)
+    _i_tags = inst.tags
+    return _i_tags
+
+def set_instance_name(fqdn):
+    return set_instance_tag('Name', fqdn)
+
 def instance_tags_required(func):
     def tags_acquirer_wrapper(*a, **kw):
         global _i_tags
