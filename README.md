@@ -9,8 +9,9 @@ WARNING: These scripts are pretty quick and dirty. Cleanups and suggestions
 welcome.
 
 ## How to use
-Copy the script `boostrap-<distro>.sh` into your instance metadata. It will
-download this repo, run setup.py, and then call a glue script of your choosing.
+Copy the script `boostrap.sh` into your instance metadata. It will update all
+the system packages (Yum and Apt currently supported), download this repo, run
+setup.py, and then call a glue script of your choosing.
 
 ### Variables that affect the bootstrap script
 There are a number of variables that will affect the behavior of the canned
@@ -155,3 +156,7 @@ for example).
 ### Launch configuration update
 At Crunch.io, we use an ansible playbook to create and manage our autoscaling
 groups and launch configurations.
+
+## Debugging bootstrap script
+Look for script log files in /var/log/cloud-init-output.log or on the system's
+console output.

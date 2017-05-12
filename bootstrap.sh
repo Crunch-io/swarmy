@@ -21,16 +21,43 @@ if [ -n "$DEBUG" ]; then
     #printenv
 fi
 
-#Other ENV Args useful for pre-tasks
-DEBIAN_FRONTEND=noninteractive
+function apt_update
+{
+    #Other ENV Args useful for pre-tasks
+    DEBIAN_FRONTEND=noninteractive
 
-#Update all local packages
-apt-get -q update && apt-get -q upgrade -y
+    #Update all local packages
+    apt-get -q update && apt-get -q upgrade -y
 
-#First set up a list of packages to install
-PKGS="python-virtualenv curl libyaml-dev python-dev"
+    #First set up a list of packages to install
+    PKGS="python-virtualenv curl libyaml-dev python-dev"
 
-apt-get -q install -y $PKGS
+    apt-get -q install -y $PKGS
+}
+
+function yum_update
+{
+    #Disable the fastest mirror plugin: it takes too long to figure itself out
+    sed -i.bstrap -e 's/^enabled=.*$/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
+
+    if [ -n "$DEBUG" ]; then
+        YUMQUIET='-q'
+    fi
+    yum update $YUMQUIET -y
+
+    yum install $YUMQUIET -y python-virtualenv
+}
+
+function update_pkgs
+{
+    if which yum > /dev/null; then
+        yum_update
+    elif which apt-get > /dev/null; then
+        apt_update
+    fi
+}
+
+update_pkgs
 
 #Create a virtualenv
 virtualenv VENV
@@ -52,7 +79,7 @@ function download_next
     # FILE will be set to the local path of the file
     # Calling method is responsible for deleting the file
 
-    OUT=$(mktemp --suffix="$2" bootstrap_ubuntu.XXXXXXXXXX) || { echo "Failed to create temp file"; exit 1; }
+    OUT=$(mktemp --suffix="$2" bootstrap.XXXXXXXXXX) || { echo "Failed to create temp file"; exit 1; }
     case "$1" in
       s3://*)
         #Download the script, set perms, and then execute
