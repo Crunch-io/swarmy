@@ -45,7 +45,7 @@ function yum_update
     fi
     yum update $YUMQUIET -y
 
-    yum install $YUMQUIET -y python-virtualenv
+    yum install $YUMQUIET -y python-virtualenv nvme-cli
 }
 
 function update_pkgs
