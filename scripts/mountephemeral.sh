@@ -17,6 +17,8 @@
 
 #TODO This should probably be a python script because of all the magic bashisms
 #  that are difficult to interpret by humans
+#     This needs safety precautions so that we don't accidentally wipe the boot
+#  volume or other EBS volumes that are mounted
 
 RAIDLEVEL=${RAIDLEVEL:-0}
 RAIDNAME=${RAIDNAME:-DATA}
@@ -136,7 +138,6 @@ if [ -n "$FORCE" ]; then
         sed -i -e "\#.*\s$MDDEV\s.*#d" /etc/mdadm.conf || true
 
         # Remove the Software Raid device
-        #TODO
         mdadm --stop $MDDEV || true
         # Delete the device
         mdadm --remove $MDDEV || true
@@ -167,6 +168,16 @@ fi
     # Look at mdadm.conf
     if grep -q $MDDEV /etc/mdadm.conf; then
         error "The mount device $MDDEV is already configured in /etc/mdadm.conf"
+    fi
+
+    #fix ephemeral, where mounted on /mnt
+    if is_mounted "/mnt"; then
+        umount -f /mnt
+        sed -i -e "\#.*\s/mnt\s.*#d" /etc/fstab
+        #WARNING, this wipes devices
+        for dev in ${DEVICES[@]}; do
+            dd if=/dev/zero of=/dev/$dev bs=10MB count=1
+        done
     fi
 )
 
