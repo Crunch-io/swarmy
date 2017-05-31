@@ -10,54 +10,18 @@ cd /root
 #Settings needed to bootstrap and load settings
 #TODO: GIT_BRANCH=${GIT_BRANCH:-master}
 #PIP_ARGS=""
+# Can read multiple settings URLS by separating them with a space
 #SETTINGS_URL=""
 #DEBUG=true
 
 # Can be set here, or loaded from s3 settings
+#   Takes a semicolon separated list of scripts to run
 NEXT_SCRIPT=${NEXT_SCRIPT:-""}
 
 if [ -n "$DEBUG" ]; then
     set -x
     #printenv
 fi
-
-function apt_update
-{
-    #Other ENV Args useful for pre-tasks
-    DEBIAN_FRONTEND=noninteractive
-
-    #Update all local packages
-    apt-get -q update && apt-get -q upgrade -y
-
-    #First set up a list of packages to install
-    PKGS="python-virtualenv curl libyaml-dev python-dev"
-
-    apt-get -q install -y $PKGS
-}
-
-function yum_update
-{
-    #Disable the fastest mirror plugin: it takes too long to figure itself out
-    sed -i.bstrap -e 's/^enabled=.*$/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf
-
-    if [ -n "$DEBUG" ]; then
-        YUMQUIET='-q'
-    fi
-    yum update $YUMQUIET -y
-
-    yum install $YUMQUIET -y python-virtualenv nvme-cli
-}
-
-function update_pkgs
-{
-    if which yum > /dev/null; then
-        yum_update
-    elif which apt-get > /dev/null; then
-        apt_update
-    fi
-}
-
-update_pkgs
 
 #Create a virtualenv
 virtualenv VENV
@@ -100,32 +64,43 @@ function download_next
 
 # Load environment settings from URL
 if [ -n "$SETTINGS_URL" ]; then
-    SSS=$(download_next $SETTINGS_URL .profile)
+    URLLIST=($SETTINGS_URL)
+    for settings in ${URLLIST[@]}; do
+        if [ -n "$settings" ]; then
+            SSS=$(download_next $settings .profile)
 
-    set +e
+            set +e
 
-    source $SSS
+            source $SSS
 
-    #clean up
-    if [ -z "$DEBUG" ]; then
-        rm -f $SSS
-    fi
-    set -e
+            #clean up
+            if [ -z "$DEBUG" ]; then
+                rm -f $SSS
+            fi
+            set -e
+        fi
+    done
 else
     if [ -n "$DEBUG" ]; then
-        echo "No settings file provided."
+        echo "No settings url provided."
     fi
 fi
 
 # Call the next script
+# Make this an array
 if [ -n "$NEXT_SCRIPT" ]; then
-    SCRIPT=$(download_next $NEXT_SCRIPT .stage2.sh)
+    read -a URLLIST <<<$NEXT_SCRIPT
+    for script in ${URLLIST[@]}; do
+        if [ -n "$script" ]; then
+            SCRIPT=$(download_next $script .stage2.sh)
 
-    source $SCRIPT
+            source $SCRIPT
 
-    if [ -z "$DEBUG" ]; then
-        rm -f $SCRIPT
-    fi
+            if [ -z "$DEBUG" ]; then
+                rm -f $SCRIPT
+            fi
+        fi
+    done
 else
     if [ -n "$DEBUG" ]; then
         echo "No stage 2 provided."
