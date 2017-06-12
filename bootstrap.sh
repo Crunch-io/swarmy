@@ -7,6 +7,14 @@
 set -e
 cd /root
 
+# Directory where we store intermediate steps/arguments/things we want to share
+# between scripts
+if [ ! -d /root/.swarmy ]; then
+    mkdir /root/.swarmy/
+fi
+
+export SWARMYDIR=/root/.swarmy/
+
 #Settings needed to bootstrap and load settings
 #TODO: GIT_BRANCH=${GIT_BRANCH:-master}
 #PIP_ARGS=""
