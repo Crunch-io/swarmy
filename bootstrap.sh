@@ -31,9 +31,13 @@ if [ -n "$DEBUG" ]; then
     #printenv
 fi
 
-#Create a virtualenv
-virtualenv VENV
+#Create a virtualenv, don't download new pip/setuptools
+virtualenv --no-download VENV
 . VENV/bin/activate
+
+# This allows pinning pip/setuptools from your own PyPI repo
+pip install $PIP_ARGS -U pip
+pip install $PIP_ARGS -U setuptools
 
 if [ ! -d swarmy ]
 then
