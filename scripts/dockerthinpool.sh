@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# This script is meant to be chained after prepephemeral.sh, other scripts like
+# mountephemeral.sh can be used in a chain loaded fashion to then format and
+# mount the new scratchspace that lives on LVM as a logical volume.
+
 VGNAME=${VGNAME:-data}
 DOCKERPERCENT={$DOCKERPERCENT:-50}
 

@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# This script is meant to be chainloaded after prepephemeral.sh as it will use
+# the ephemeral device, create a filesystem on it and mount it on the the
+# mountpoint.
+
 # Assumptions (ENVVAR that overrides it):
 #   * Filesystem type is ext4 (FS_TYPE)
 #   * mkfs options are no journaling, and no root reservation (FS_OPTIONS, TUNE2FS_OPTIONS)
