@@ -27,9 +27,23 @@ fi
 
 export SWARMYDIR=/root/.swarmy/
 
+if [ -z "$DEBUG" ]; then
+    # If we aren't debugging, we just want to have stdout/stderr be redirect to
+    # files instead so that we can check after the fact that things ran
+    # successfully
 
+    # Close STDOUT file descriptor
+    exec 1<&-
+    # Close STDERR FD
+    exec 2<&-
 
-if [ -n "$DEBUG" ]; then
+    # Open STDOUT as $LOG_FILE file for read and write.
+    exec 1<>$SWARMYDIR/log.stdout
+
+    # Redirect STDERR to STDOUT
+    exec 2<>$SWARMYDIR/log.stderr
+else
+    echo "Debug run of swarmy bootstrap.sh"
     set -x
     #printenv
 fi
@@ -106,7 +120,7 @@ if [ -n "$NEXT_SCRIPT" ]; then
     for script in ${URLLIST[@]}; do
         if [ -n "$script" ]; then
             SCRIPT=$(download_next $script .stage2.sh)
-
+            
             source $SCRIPT
 
             if [ -z "$DEBUG" ]; then
@@ -115,9 +129,7 @@ if [ -n "$NEXT_SCRIPT" ]; then
         fi
     done
 else
-    if [ -n "$DEBUG" ]; then
-        echo "No stage 2 provided."
-    fi
+    echo "No stage 2 provided."
 fi
 
 echo "Bootstrap script finished" >> /root/cloud-init-bootstrap.log
