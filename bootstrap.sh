@@ -4,6 +4,18 @@
 # system log available through the AWS API, or the
 # console.
 
+#Settings needed to bootstrap and load settings
+#TODO: GIT_BRANCH=${GIT_BRANCH:-master}
+#PIP_ARGS=""
+# Can read multiple settings URLS by separating them with a space
+#SETTINGS_URL=""
+#DEBUG=true
+
+# Can be set here, or loaded from s3 settings
+#   Takes a semicolon separated list of scripts to run
+NEXT_SCRIPT=${NEXT_SCRIPT:-""}
+
+
 set -e
 cd /root
 
@@ -15,16 +27,7 @@ fi
 
 export SWARMYDIR=/root/.swarmy/
 
-#Settings needed to bootstrap and load settings
-#TODO: GIT_BRANCH=${GIT_BRANCH:-master}
-#PIP_ARGS=""
-# Can read multiple settings URLS by separating them with a space
-#SETTINGS_URL=""
-#DEBUG=true
 
-# Can be set here, or loaded from s3 settings
-#   Takes a semicolon separated list of scripts to run
-NEXT_SCRIPT=${NEXT_SCRIPT:-""}
 
 if [ -n "$DEBUG" ]; then
     set -x
