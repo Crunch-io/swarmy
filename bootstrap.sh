@@ -45,9 +45,7 @@ then
     curl -sL https://github.com/Crunch-io/swarmy/tarball/master | tar -xz --strip-components=1 -C swarmy
 fi
 
-cd swarmy
-python setup.py develop $PIP_ARGS
-cd /root
+pip install $PIP_ARGS -e swarmy
 
 function download_next
 {
