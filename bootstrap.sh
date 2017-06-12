@@ -48,6 +48,9 @@ else
     #printenv
 fi
 
+echo -n "Starting swarmy bootstrap: "
+date
+
 #Create a virtualenv, don't download new pip/setuptools
 virtualenv --no-download VENV
 . VENV/bin/activate
@@ -132,4 +135,5 @@ else
     echo "No stage 2 provided."
 fi
 
-echo "Bootstrap script finished" >> /root/cloud-init-bootstrap.log
+echo -n "Swarmy bootstrap script finished: "
+date
