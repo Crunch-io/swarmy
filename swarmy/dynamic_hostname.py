@@ -7,7 +7,7 @@ Uses instance metadata and instance tags, or specify on the
 command line all the data you need.
 
 Usage:
-  dynamic_hostname [-1|-2|-3] [options] (--domain-tag=<domain_tag>|--domain=<domain>)
+  dynamic_hostname [-0|-1|-2|-3] [options] (--domain-tag=<domain_tag>|--domain=<domain>)
 
 Options:
   -h --help     Show this screen.
@@ -21,6 +21,7 @@ Options:
   -S --screen-only
                 Only print the hostname to the screen, implies --no-host and --no-dns
   -P --public   Use the public IP instead of the private (Private ip is used by default)
+  -0            Don't use any parts of the IP address
   -1            Use the last part of the IP only
   -2            Use the last 2 parts
   -3            Use the last 3 parts
@@ -68,7 +69,10 @@ def get_prefix_from_tags(tagName):
 
 def gen_fqdn(ip, hostprefix, numparts=2, domain='example.com', sep=''):
     # split off the unique parts
-    host_ip_part = '-'.join(ip.split('.')[0-numparts:])
+    if numparts >= 1:
+        host_ip_part = '-'.join(ip.split('.')[0-numparts:])
+    else:
+        numparts = ""
 
     return hostprefix + sep + host_ip_part + '.' + domain
 
@@ -80,13 +84,16 @@ def main():
 
     #print arguments
 
-    numparts = 4
-    if arguments['-1']:
+    if arguments['-0']:
+        numparts = 0
+    elif arguments['-1']:
         numparts = 1
     elif arguments['-2']:
         numparts = 2
     elif arguments['-3']:
         numparts = 3
+    else:
+        numparts = 4
 
     #prefix has default value of 'ip-'
     prefix = arguments['--prefix']
