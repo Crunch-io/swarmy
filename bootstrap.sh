@@ -4,11 +4,8 @@
 # system log available through the AWS API, or the
 # console.
 
-set -e
-cd /root
-
 #Settings needed to bootstrap and load settings
-#TODO: GIT_BRANCH=${GIT_BRANCH:-master}
+GIT_BRANCH=${GIT_BRANCH:-master}
 #PIP_ARGS=""
 # Can read multiple settings URLS by separating them with a space
 #SETTINGS_URL=""
@@ -18,24 +15,67 @@ cd /root
 #   Takes a semicolon separated list of scripts to run
 NEXT_SCRIPT=${NEXT_SCRIPT:-""}
 
-if [ -n "$DEBUG" ]; then
+
+set -e
+cd /root
+
+# Directory where we store intermediate steps/arguments/things we want to share
+# between scripts
+if [ ! -d /root/.swarmy ]; then
+    mkdir /root/.swarmy/
+fi
+
+export SWARMYDIR=/root/.swarmy/
+
+if [ -z "$DEBUG" ]; then
+    # If we aren't debugging, we just want to have stdout/stderr be redirect to
+    # files instead so that we can check after the fact that things ran
+    # successfully
+
+    # Close STDOUT file descriptor
+    exec 1<&-
+    # Close STDERR FD
+    exec 2<&-
+
+    # Open STDOUT as $LOG_FILE file for read and write.
+    exec 1<>$SWARMYDIR/log.stdout
+
+    # Redirect STDERR to STDOUT
+    exec 2<>$SWARMYDIR/log.stderr
+else
+    echo "Debug run of swarmy bootstrap.sh"
     set -x
     #printenv
 fi
 
-#Create a virtualenv
-virtualenv VENV
+echo -n "Starting swarmy bootstrap: "
+date
+
+#Create a virtualenv, don't download new pip/setuptools
+virtualenv --no-download VENV
 . VENV/bin/activate
+
+# This allows pinning pip/setuptools from your own PyPI repo
+pip install $PIP_ARGS -U pip
+pip install $PIP_ARGS -U setuptools
 
 if [ ! -d swarmy ]
 then
     mkdir -p swarmy
-    curl -sL https://github.com/Crunch-io/swarmy/tarball/master | tar -xz --strip-components=1 -C swarmy
+    # Do this in multiple steps so that a failure to download doesn't cause tar
+    # to uncompress partially
+    curl -sL -o swarmy.tar.gz \
+        "https://api.github.com/repos/Crunch-io/swarmy/tarball/${GIT_BRANCH}"
+    if [ $? -gt 0 ]; then
+        echo "Failed to download Swarmy. Refusing to continue."
+        rm -f swarmy.tar.gz
+        exit 1
+    fi
+    tar -xzf swarmy.tar.gz --strip-components=1 -C swarmy
+    rm -f swarmy.tar.gz
 fi
 
-cd swarmy
-python setup.py develop $PIP_ARGS
-cd /root
+pip install $PIP_ARGS -e swarmy
 
 function download_next
 {
@@ -93,7 +133,7 @@ if [ -n "$NEXT_SCRIPT" ]; then
     for script in ${URLLIST[@]}; do
         if [ -n "$script" ]; then
             SCRIPT=$(download_next $script .stage2.sh)
-
+            
             source $SCRIPT
 
             if [ -z "$DEBUG" ]; then
@@ -102,9 +142,8 @@ if [ -n "$NEXT_SCRIPT" ]; then
         fi
     done
 else
-    if [ -n "$DEBUG" ]; then
-        echo "No stage 2 provided."
-    fi
+    echo "No stage 2 provided."
 fi
 
-echo "Bootstrap script finished" >> /root/cloud-init-bootstrap.log
+echo -n "Swarmy bootstrap script finished: "
+date

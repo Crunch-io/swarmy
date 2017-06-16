@@ -1,4 +1,5 @@
 # swarmy
+
 A collection of boto based scripts (mostly) that are useful for running as part
 of user metadata scripts on AWS EC2, either when autoscaling, or just during
 instance creation, or as periodic maintenance tasks. These scripts are designed
@@ -9,11 +10,13 @@ WARNING: These scripts are pretty quick and dirty. Cleanups and suggestions
 welcome.
 
 ## How to use
+
 Copy the script `boostrap.sh` into your instance metadata. It will update all
 the system packages (Yum and Apt currently supported), download this repo, run
 setup.py, and then call a glue script of your choosing.
 
 ### Variables that affect the bootstrap script
+
 There are a number of variables that will affect the behavior of the canned
 bootstrap.sh script. Of course you are free to provide your own bootstrap
 script instead.
@@ -26,8 +29,13 @@ script instead.
  * `HOSTNAME_ARGS`: The arguments to pass to `dynamic_hostname` (described
    below). You must provide at least the `--domain` or `--domain-tag` argument.
 
+ * `SWARMYDIR`: A location where Swarmy is able to store information on the
+   stages that have been run, as well as allow rudimentary message passing
+   using text files. Defaults to `/root/.swarmy`
+
 ### Sample S3 profile to load these and other environment variables from S3
-Set the SETTINGS_URL environment variable in the bootstrap script to load and
+
+Set the `SETTINGS_URL` environment variable in the bootstrap script to load and
 source a file locally, over http(s), or from s3. For s3 retrieval this should
 be formatted like a s3 url used by `aws s3` commands (e.g.,
 s3://crunchio-autoscale/settings.profile)
@@ -135,9 +143,21 @@ A full policy might look like this:
 ```
 
 ## Scripts Available
+
 We've written a number of scripts that may make your life easier.
 
-### dynamic\_hostname
+In `bootstraph.sh` the variable `NEXT_SCRIPT` should be set a `;` (semicolon)
+delineated list of scripts to run, this allows chaining scripts together:
+
+```shell
+NEXT_SCRIPT="stage2.sh;prephemeral.sh;mountephemeral.sh"
+```
+
+For example will run `stage2.sh`, `prepephemeral.sh` and then
+`mountephemeral.sh` in that order.
+
+### stage2.sh
+
 Sets the hostname based on
 
  * The private-ip (or public ip) of the instance
@@ -149,14 +169,38 @@ Once the hostname is determined, sets the hostname via the hostname command,
 and registers the hostname in Route53. Can also wait for the record to be
 propagated before exiting.
 
-### trigger\_jenkins\_job (TODO)
-Calls the Jenkins API to trigger some sort of action. (Used instead of Lambda,
-for example).
+### prepephemeral.sh
+
+This will using the aws command grab information from EC2 regarding the
+available ephemeral drives in the system. If there is more than 1, it will
+create an md raid array to be able to utilize it as a single disk.
+
+### mountephemeral.sh
+
+Using the output from `prepephemeral.sh` (a file dropped in
+`$SWARMYDIR/ephemeralldev`) it will create a new file system and then mount it,
+as well as add the appropriate fstab entries.
+
+### dockerthinpool.sh
+
+Using the output from `prepephemeral.sh` (a file dropped in
+`$SWARMYDIR/ephemeraldev`) it will create a new LVM volume group and create a
+thinpool for the express purpose of using it with Docker. It will also create a
+smaller logical volume that may be used for an ephemeral mount.
+
+Run `mountephemeral.sh` after `dockerthinpool.sh` to set up the "scratch"
+logical volume:
+
+```shell
+NEXT_SCRIPT="${NEXT_SCRIPT:+${NEXT_SCRIPT};}prepephemeral.sh;dockerthinpool.sh;mountephemeral.sh"
+```
 
 ### Launch configuration update
+
 At Crunch.io, we use an ansible playbook to create and manage our autoscaling
 groups and launch configurations.
 
 ## Debugging bootstrap script
-Look for script log files in /var/log/cloud-init-output.log or on the system's
-console output.
+
+Look for script log files in /var/log/cloud-init-output.log and swarmy itself
+redirects output into `$SWARMYDIR/log.stdout` and `$SWARMYDIR/log.stderr`
