@@ -5,7 +5,7 @@
 # console.
 
 #Settings needed to bootstrap and load settings
-#TODO: GIT_BRANCH=${GIT_BRANCH:-master}
+GIT_BRANCH=${GIT_BRANCH:-master}
 #PIP_ARGS=""
 # Can read multiple settings URLS by separating them with a space
 #SETTINGS_URL=""
@@ -62,7 +62,17 @@ pip install $PIP_ARGS -U setuptools
 if [ ! -d swarmy ]
 then
     mkdir -p swarmy
-    curl -sL https://github.com/Crunch-io/swarmy/tarball/master | tar -xz --strip-components=1 -C swarmy
+    # Do this in multiple steps so that a failure to download doesn't cause tar
+    # to uncompress partially
+    curl -sL -o swarmy.tar.gz \
+        "https://api.github.com/repos/Crunch-io/swarmy/tarball/${GIT_BRANCH}"
+    if [ $? -gt 0 ]; then
+        echo "Failed to download Swarmy. Refusing to continue."
+        rm -f swarmy.tar.gz
+        exit 1
+    fi
+    tar -xzf swarmy.tar.gz --strip-components=1 -C swarmy
+    rm -f swarmy.tar.gz
 fi
 
 pip install $PIP_ARGS -e swarmy
