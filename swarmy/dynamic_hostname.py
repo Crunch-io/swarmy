@@ -72,7 +72,7 @@ def gen_fqdn(ip, hostprefix, numparts=2, domain='example.com', sep=''):
     if numparts >= 1:
         host_ip_part = '-'.join(ip.split('.')[0-numparts:])
     else:
-        numparts = ""
+        host_ip_part = ""
 
     return hostprefix + sep + host_ip_part + '.' + domain
 
