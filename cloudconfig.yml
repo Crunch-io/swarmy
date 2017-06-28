@@ -1,0 +1,6 @@
+package_upgrade: true
+packages:
+  - nvme-cli
+  - mdadm
+  - python-virtualenv
+  - libyaml-devel
