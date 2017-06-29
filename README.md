@@ -54,7 +54,7 @@ s3://crunchio-autoscale/settings.profile)
 
 ```shell
 # Treat like a .profile ...
-NEXT_SCRIPT=${NEXT_SCRIPT:-stage2.sh}
+NEXT_SCRIPT=${NEXT_SCRIPT:-swarmy/scripts/stage2.sh}
 HOSTNAME_ARGS=${HOSTNAME_ARGS:-"-2 --domain-tag=Domain --prefix-tag=aws:autoscaling:groupName --wait 10"}
 JENKINS_BASE=${JENKINS_BASE:-https://ci.crunch.io/}
 JENKINS_USER=user@example.com:API_key
@@ -62,7 +62,7 @@ JENKINS_USER=user@example.com:API_key
 
 These files can be loaded from http/https, S3, or anywhere on the system. If no
 URL protocol is given, the script is "sourced" from the local system. If a
-relative path is provided, it is relative to the root of the swarmy checkout.
+relative path is provided, it is relative to root's homedir.
 
 Note that for S3 settings, the instance must be defined with an IAM role, or
 the bootstrap script must otherwise set up credentials to make the AWS API
@@ -164,11 +164,11 @@ A full policy might look like this:
 
 We've written a number of scripts that may make your life easier.
 
-In `bootstrap.sh` the variable `NEXT_SCRIPT` should be set a `;` (semicolon)
+In `bootstrap.sh` the variable `NEXT_SCRIPT` should be set a ` ` (space)
 delineated list of scripts to run, this allows chaining scripts together:
 
 ```shell
-NEXT_SCRIPT="scripts/stage2.sh;scripts/prephemeral.sh;scripts/mountephemeral.sh"
+NEXT_SCRIPT="scripts/stage2.sh scripts/prephemeral.sh;scripts/mountephemeral.sh"
 ```
 
 For example will run `stage2.sh`, `prepephemeral.sh` and then
@@ -176,7 +176,7 @@ For example will run `stage2.sh`, `prepephemeral.sh` and then
 
 These files can be loaded from http/https, S3, or anywhere on the system. If no
 URL protocol is given, the script is "sourced" from the local system. If a
-relative path is provided, it is relative to the root of the swarmy checkout.
+relative path is provided, it is relative to root's homedir.
 
 ### stage2.sh
 
@@ -228,7 +228,7 @@ Run `mountephemeral.sh` after `dockerthinpool.sh` to set up the "scratch"
 logical volume:
 
 ```shell
-NEXT_SCRIPT="${NEXT_SCRIPT:+${NEXT_SCRIPT};}prepephemeral.sh;dockerthinpool.sh;mountephemeral.sh"
+NEXT_SCRIPT="${NEXT_SCRIPT:+${NEXT_SCRIPT} }prepephemeral.sh dockerthinpool.sh mountephemeral.sh"
 ```
 
 #### Prerequisites
