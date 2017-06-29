@@ -30,8 +30,8 @@ if [ ! -b $DEVICE ]; then
 fi
 
 if ! command -v lvm > /dev/null; then
-    echo "Installing required tools..."
-    yum install -y device-mapper-persistent-data lvm2
+    echo "Please make sure that lvm and device-mapper-persistent-data are installed"
+    exit 1
 fi
 
 if ! vgdisplay $VGNAME; then

@@ -15,6 +15,10 @@ GIT_BRANCH=${GIT_BRANCH:-master}
 #   Takes a semicolon separated list of scripts to run
 NEXT_SCRIPT=${NEXT_SCRIPT:-""}
 
+### PREREQs
+# python virtualenv and pip
+# curl
+
 
 set -e
 cd /root
