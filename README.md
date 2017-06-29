@@ -15,6 +15,19 @@ Copy the script `boostrap.sh` into your instance metadata. It will update all
 the system packages (Yum and Apt currently supported), download this repo, run
 setup.py, and then call a glue script of your choosing.
 
+### Prerequisites
+
+The bootstrap script and several of the provided stage2 scripts depend on
+system packages that may not be in the base system you have selected. It is
+suggested that you use cloud-init's cloud-config yaml format to install them.
+See `cloudconfig.yml` for an example. Make sure you include hardware enabling
+packages here (e.g., nvme-cli). A script (`cloudmultipart.py`) has been
+provided to assemble various cloud-init directives into a single file to be
+posted as AWS User Data (or similar).
+
+The `bootstrap.sh` script provided by swarmy requires virtualenv, curl, and
+pip. We also suggest installing the development package for libyaml.
+
 ### Variables that affect the bootstrap script
 
 There are a number of variables that will affect the behavior of the canned
@@ -28,7 +41,6 @@ script instead.
    even something on S3 or https.
  * `HOSTNAME_ARGS`: The arguments to pass to `dynamic_hostname` (described
    below). You must provide at least the `--domain` or `--domain-tag` argument.
-
  * `SWARMYDIR`: A location where Swarmy is able to store information on the
    stages that have been run, as well as allow rudimentary message passing
    using text files. Defaults to `/root/.swarmy`
@@ -48,11 +60,17 @@ JENKINS_BASE=${JENKINS_BASE:-https://ci.crunch.io/}
 JENKINS_USER=user@example.com:API_key
 ```
 
+These files can be loaded from http/https, S3, or anywhere on the system. If no
+URL protocol is given, the script is "sourced" from the local system. If a
+relative path is provided, it is relative to the root of the swarmy checkout.
+
 Note that for S3 settings, the instance must be defined with an IAM role, or
 the bootstrap script must otherwise set up credentials to make the AWS API
 request.
 
-As part of that IAM role, if you wish to set up DNS, you'll need a policy that grants that right to the IAM Role assigned. Similarly if you'd like to update the instance tags, you'll need those rights too.
+As part of that IAM role, if you wish to set up DNS, you'll need a policy that
+grants that right to the IAM Role assigned. Similarly if you'd like to update
+the instance tags, you'll need those rights too.
 
 A full policy might look like this:
 
@@ -146,15 +164,19 @@ A full policy might look like this:
 
 We've written a number of scripts that may make your life easier.
 
-In `bootstraph.sh` the variable `NEXT_SCRIPT` should be set a `;` (semicolon)
+In `bootstrap.sh` the variable `NEXT_SCRIPT` should be set a `;` (semicolon)
 delineated list of scripts to run, this allows chaining scripts together:
 
 ```shell
-NEXT_SCRIPT="stage2.sh;prephemeral.sh;mountephemeral.sh"
+NEXT_SCRIPT="scripts/stage2.sh;scripts/prephemeral.sh;scripts/mountephemeral.sh"
 ```
 
 For example will run `stage2.sh`, `prepephemeral.sh` and then
 `mountephemeral.sh` in that order.
+
+These files can be loaded from http/https, S3, or anywhere on the system. If no
+URL protocol is given, the script is "sourced" from the local system. If a
+relative path is provided, it is relative to the root of the swarmy checkout.
 
 ### stage2.sh
 
@@ -169,17 +191,31 @@ Once the hostname is determined, sets the hostname via the hostname command,
 and registers the hostname in Route53. Can also wait for the record to be
 propagated before exiting.
 
+#### Prerequisites
+
+None once swarmy is pip installed.
+
 ### prepephemeral.sh
 
 This will using the aws command grab information from EC2 regarding the
-available ephemeral drives in the system. If there is more than 1, it will
+available ephemeral drives in the system. If there is more than one, it will
 create an md raid array to be able to utilize it as a single disk.
+
+#### Prerequisites
+
+mdadm (plus aws-cli and curl installed with swarmy in `bootstrap.sh`).
 
 ### mountephemeral.sh
 
 Using the output from `prepephemeral.sh` (a file dropped in
 `$SWARMYDIR/ephemeralldev`) it will create a new file system and then mount it,
-as well as add the appropriate fstab entries.
+as well as add the appropriate fstab entries. See the top of the
+`mountephemeral.sh` for environment variables that can modify the scratch space
+mapped.
+
+#### Prerequisites
+
+The userspace programs for the file system you've chosen (e.g., xfsprogs, e2fsprogs)
 
 ### dockerthinpool.sh
 
@@ -194,6 +230,10 @@ logical volume:
 ```shell
 NEXT_SCRIPT="${NEXT_SCRIPT:+${NEXT_SCRIPT};}prepephemeral.sh;dockerthinpool.sh;mountephemeral.sh"
 ```
+
+#### Prerequisites
+
+lvm2 and device-mapper-persistent-data
 
 ### Launch configuration update
 
