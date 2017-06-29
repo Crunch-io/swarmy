@@ -11,9 +11,9 @@ welcome.
 
 ## How to use
 
-Copy the script `boostrap.sh` into your instance metadata. It will update all
-the system packages (Yum and Apt currently supported), download this repo, run
-setup.py, and then call a glue script of your choosing.
+Copy the script `boostrap.sh` into your instance metadata. It will create a
+virtualenv, download this repo, run setup.py, and then call a glue script of
+your choosing.
 
 ### Prerequisites
 
