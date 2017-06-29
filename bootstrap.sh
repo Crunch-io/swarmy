@@ -137,7 +137,7 @@ if [ -n "$NEXT_SCRIPT" ]; then
     for script in ${URLLIST[@]}; do
         if [ -n "$script" ]; then
             SCRIPT=$(download_next $script .stage2.sh)
-            
+
             source $SCRIPT
 
             if [ -z "$DEBUG" ]; then
