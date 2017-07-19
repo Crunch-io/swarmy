@@ -53,7 +53,7 @@ function find_aws {
     fi
 }
 
-AWSCMD=$(find_aws)
+find_aws
 
 function get_metadata {
     curl -s http://169.254.169.254$1
