@@ -68,10 +68,10 @@ function is_formatted() {
     fi
 )
 
-if [ -n "$FORCE" ] || ! is_formatted $MDDEV $FS_TYPE; then
-    mkfs.$FS_TYPE -L $FS_LABEL $FS_OPTIONS $MDDEV
+if [ -n "$FORCE" ] || ! is_formatted $DEVICE $FS_TYPE; then
+    mkfs.$FS_TYPE -L $FS_LABEL $FS_OPTIONS $DEVICE
     if [ -n "$TUNE2FS_OPTIONS" ]; then
-        tune2fs $TUNE2FS_OPTIONS $MDDEV
+        tune2fs $TUNE2FS_OPTIONS $DEVICE
     fi
 fi
 
