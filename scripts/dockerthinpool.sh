@@ -5,7 +5,7 @@
 # mount the new scratchspace that lives on LVM as a logical volume.
 
 VGNAME=${VGNAME:-data}
-DOCKERPERCENT={$DOCKERPERCENT:-50}
+DOCKERPERCENT=${DOCKERPERCENT:-50}
 
 # 1% of the VG is already used by the thinpool meta, so the max number here is
 # 49 assuming you leave DOCKERPERCENT at 50. Start small and you can always
