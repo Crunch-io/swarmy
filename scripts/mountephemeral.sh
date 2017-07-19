@@ -33,7 +33,7 @@ if [ ! -f "$SWARMYDIR/ephemeraldev" ]; then
     exit 1
 fi
 
-read DEVICE < $SWARMYDIR/ephemeraldev
+DEVICE=$(cat $SWARMYDIR/ephemeraldev)
 
 
 function is_mounted() {
