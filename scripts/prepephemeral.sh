@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -xe
 
 # This currently works only for systems on EC2. Other systems should be
 # possible, but will require some work.
@@ -136,6 +136,7 @@ else
             blockdev --setra 65536 $MDDEV
             echo $((30*1024)) > /proc/sys/dev/raid/speed_limit_min
         )
+    fi
 fi
 
 if [ -n "$MDDEV" ]; then
