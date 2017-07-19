@@ -78,6 +78,10 @@ fi
 # mount via LABEL not device name, in case it changes
 echo LABEL=$FS_LABEL $MOUNTPOINT $FS_TYPE defaults,nofail,noatime,discard 0 2 >> /etc/fstab
 
+if [ ! -d $MOUNTPOINT ]; then
+    mkdir -p $MOUNTPOINT
+fi
+
 #Mount it
 mount $MOUNTPOINT
 
