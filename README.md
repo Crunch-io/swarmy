@@ -23,7 +23,10 @@ suggested that you use cloud-init's cloud-config yaml format to install them.
 See `cloudconfig.yml` for an example. Make sure you include hardware enabling
 packages here (e.g., nvme-cli). A script (`cloudmultipart.py`) has been
 provided to assemble various cloud-init directives into a single file to be
-posted as AWS User Data (or similar).
+posted as AWS User Data (or similar). Run it as follows:
+`python cloudmultipart.py cloudconfig.yml:cloud-config bootstrap.sh:x-shellscript > multipart.txt`
+Note that the text/ part of the content-type header is provided for you by the
+script.
 
 The `bootstrap.sh` script provided by swarmy requires virtualenv, curl, and
 pip. We also suggest installing the development package for libyaml.
