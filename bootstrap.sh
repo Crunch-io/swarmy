@@ -56,7 +56,7 @@ echo -n "Starting swarmy bootstrap: "
 date
 
 #Create a virtualenv, don't download new pip/setuptools
-virtualenv --no-download VENV
+virtualenv VENV
 . VENV/bin/activate
 
 # This allows pinning pip/setuptools from your own PyPI repo
