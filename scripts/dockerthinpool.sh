@@ -22,7 +22,7 @@ if [ ! -f "$SWARMYDIR/ephemeraldev" ]; then
     exit 1
 fi
 
-read DEVICE < $SWARMYDIR/ephemeraldev
+DEVICE=$(cat $SWARMYDIR/ephemeraldev)
 
 if [ ! -b $DEVICE ]; then
     echo "The device \"$DEVICE\" is not a block device. Cowardly refusing to continue"
