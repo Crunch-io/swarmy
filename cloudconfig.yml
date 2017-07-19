@@ -4,3 +4,5 @@ packages:
   - mdadm
   - python-virtualenv
   - libyaml-devel
+  - device-mapper-persistent-data
+  - lvm2

@@ -18,5 +18,5 @@ dynamic_hostname $HOSTNAME_ARGS
 #fi
 if [ -n "$DEBUG" ]; then
     # This helps us to know that this was run completely
-    touch /root/stage-2.run
+    touch $SWARMYDIR/stage-2.run
 fi
