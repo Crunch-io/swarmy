@@ -130,7 +130,7 @@ else
         # Make the RAID$RAIDLEVEL device
         (
             cd /dev
-            $MDADM --create --force --verbose --level=$RAIDLEVEL $MDDEV --name=$RAIDNAME --raid-devices=$NUM_DEVICES ${DEVICES[@]}
+            yes | $MDADM --create --force --verbose --level=$RAIDLEVEL $MDDEV --name=$RAIDNAME --raid-devices=$NUM_DEVICES ${DEVICES[@]}
             $MDADM --wait $MDDEV || true
             $MDADM --detail --scan >> /etc/mdadm.conf
             blockdev --setra 65536 $MDDEV
