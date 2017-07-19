@@ -12,7 +12,7 @@ GIT_BRANCH=${GIT_BRANCH:-master}
 #DEBUG=true
 
 # Can be set here, or loaded from s3 settings
-#   Takes a semicolon separated list of scripts to run
+#   Takes a space separated list of scripts to run
 NEXT_SCRIPT=${NEXT_SCRIPT:-""}
 
 ### PREREQs
