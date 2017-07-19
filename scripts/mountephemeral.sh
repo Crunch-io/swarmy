@@ -54,17 +54,20 @@ function is_formatted() {
 (
     #Check to make sure we don't already have stuff mounted
     if is_mounted "$DEVICE"; then
-        error "The mount device $DEVICE is already mounted"
+        echo "The mount device $DEVICE is already mounted"
+        exit 1
     fi
 
     # Look at mount point to make sure nothing's mounted
     if is_mounted "$MOUNTPOINT"; then
-        error "The mount point $MOUNTPOINT is already in use"
+        echo "The mount point $MOUNTPOINT is already in use"
+        exit 1
     fi
 
     # Look at fstab
     if grep -q LABEL=$FS_LABEL /etc/fstab; then
-        error "The mount point LABEL=$FS_LABEL is already listed in /etc/fstab"
+        echo "The mount point LABEL=$FS_LABEL is already listed in /etc/fstab"
+        exit 1
     fi
 )
 
