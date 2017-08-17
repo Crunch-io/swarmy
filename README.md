@@ -171,11 +171,11 @@ In `bootstrap.sh` the variable `NEXT_SCRIPT` should be set a ` ` (space)
 delineated list of scripts to run, this allows chaining scripts together:
 
 ```shell
-NEXT_SCRIPT="scripts/stage2.sh scripts/prephemeral.sh;scripts/mountephemeral.sh"
+NEXT_SCRIPT="swarmy/scripts/stage2.sh swarmy/scripts/prephemeral.sh swarmy/scripts/mountephemeral.sh"
 ```
 
 For example will run `stage2.sh`, `prepephemeral.sh` and then
-`mountephemeral.sh` in that order.
+`mountephemeral.sh` in that order from the swarmy directory relative to root's $HOME.
 
 These files can be loaded from http/https, S3, or anywhere on the system. If no
 URL protocol is given, the script is "sourced" from the local system. If a
