@@ -29,34 +29,31 @@ if [ -z "$SWARMYDIR" ]; then
     exit 1
 fi
 
-#Find aws somewhere
-function find_aws {
-
-    # If AWSCMD is not set, try to use command -v to find it, in $PATH
-    if [ -z "$AWSCMD" ]; then
-        AWSCMD=$(command -v aws)
-    fi
-
-    if [ -z "$AWSCMD" ]; then
-        # This looks for aws cli in the VENV set up by swarmy, the VENV set up by
-        # ansible, or the PATH (system package or pip install)
-        for loc in /root/VENV/bin/aws /var/lib/crunch.io/venv/bin/aws; do
-            if [ -x "$loc" ]; then
-                echo $loc
-                return 0
-            fi
-        done
-        echo "No aws cli found in the common locations: cowardly refusing to continue"
-        exit 1
-    else
-        echo "aws command found: $AWSCMD"
-    fi
-}
-
-find_aws
-
 function get_metadata {
     curl -s http://169.254.169.254$1
+}
+
+function get_ephemeral_disks {
+    itype=$1
+
+	# This is a hard coded list. :'(
+    case $itype in
+      r3.8xlarge|c3.*|m3.xlarge|m3.2xlarge)
+        DEVICES+=('/dev/xvdc');&
+      r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|m3.medium|m3.large)
+        DEVICES+=('/dev/xvdb')
+        ;;
+      i3.16xlarge)
+        DEVICES+=('/dev/nvme4n1' '/dev/nvme5n1' '/dev/nvme6n1' '/dev/nvme7n1');&
+      i3.8xlarge)
+        DEVICES+=('/dev/nvme2n1' '/dev/nvme3n1');&
+      i3.4xlarge)
+        DEVICES+=('/dev/nvme1n1');&
+      i3.large|i3.xlarge|i3.2xlarge)
+        DEVICES+=('/dev/nvme0n1')
+        ;;
+    esac
+
 }
 
 #actually gets the av zone
@@ -64,27 +61,13 @@ REGION=$(get_metadata /latest/meta-data/placement/availability-zone/)
 #remove the last char of the zone to get region
 REGION=${REGION%?}
 INSTANCE_ID=$(get_metadata /latest/meta-data/instance-id/)
+INSTANCE_TYPE=$(get_metadata /latest/meta-data/instance-type/)
 
 #Check to see what devices we need to mount
 #Get the list of EBS volumes mapped to the system
-EBS_VOLUMES=$($AWSCMD ec2 --region $REGION describe-instances --instance-ids $INSTANCE_ID  --query "Reservations[0].Instances[0].BlockDeviceMappings[*].DeviceName" --output text | sed -e 's#^/dev/sd\([a-z]\)[0-9]\+$#xvd\1#')
 
-#Get the list of block devices by name
-ALL_BLK_DEVICES=$(lsblk -ln -o NAME)
-for dev in $ALL_BLK_DEVICES; do
-    # NOTE: we assume that you won't have both on one system
-    case $dev in
-      nvme*)
-        DEVICES+=($dev)
-        ;;
-      xvd?)
-        #Make sure these are ephemeral, not EBS volumes
-        if ! [[ "$EBS_VOLUMES" =~ $dev[:digit:]? ]]; then
-            DEVICES+=($dev)
-        fi
-        ;;
-    esac
-done
+
+get_ephemeral_disks $INSTANCE_TYPE
 
 #length of the array
 NUM_DEVICES=${#DEVICES[@]}
