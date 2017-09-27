@@ -171,7 +171,7 @@ In `bootstrap.sh` the variable `NEXT_SCRIPT` should be set a ` ` (space)
 delineated list of scripts to run, this allows chaining scripts together:
 
 ```shell
-NEXT_SCRIPT="swarmy/scripts/stage2.sh swarmy/scripts/prephemeral.sh swarmy/scripts/mountephemeral.sh"
+NEXT_SCRIPT="swarmy/scripts/stage2.sh swarmy/scripts/prepephemeral.sh swarmy/scripts/mountephemeral.sh"
 ```
 
 For example will run `stage2.sh`, `prepephemeral.sh` and then
