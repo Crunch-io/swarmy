@@ -20,6 +20,7 @@
 #     This needs safety precautions so that we don't accidentally wipe the boot
 #  volume or other EBS volumes that are mounted
 
+SWARMYDIR=${SWARMYDIR:-/root/.swarmy}
 RAIDLEVEL=${RAIDLEVEL:-0}
 RAIDNAME=${RAIDNAME:-data}
 DEVICES=()
@@ -39,18 +40,18 @@ function get_ephemeral_disks {
 	# This is a hard coded list. :'(
     case $itype in
       r3.8xlarge|c3.*|m3.xlarge|m3.2xlarge)
-        DEVICES+=('/dev/xvdc');&
+        DEVICES+=('xvdc');&
       r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|m3.medium|m3.large)
-        DEVICES+=('/dev/xvdb')
+        DEVICES+=('xvdb')
         ;;
       i3.16xlarge)
-        DEVICES+=('/dev/nvme4n1' '/dev/nvme5n1' '/dev/nvme6n1' '/dev/nvme7n1');&
+        DEVICES+=('nvme4n1' 'nvme5n1' 'nvme6n1' 'nvme7n1');&
       i3.8xlarge)
-        DEVICES+=('/dev/nvme2n1' '/dev/nvme3n1');&
+        DEVICES+=('nvme2n1' 'nvme3n1');&
       i3.4xlarge)
-        DEVICES+=('/dev/nvme1n1');&
+        DEVICES+=('nvme1n1');&
       i3.large|i3.xlarge|i3.2xlarge)
-        DEVICES+=('/dev/nvme0n1')
+        DEVICES+=('nvme0n1')
         ;;
     esac
 

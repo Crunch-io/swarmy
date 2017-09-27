@@ -14,6 +14,7 @@
 # * We want ext4 (FS_TYPE)
 #   * tune2fs is set up to run always, this may not be appropriate for xfs and other fs types
 
+SWARMYDIR=${SWARMYDIR:-/root/.swarmy}
 MOUNTPOINT=${MOUNTPOINT:-/scratch0}
 FS_TYPE=${FS_TYPE:-ext4}
 FS_LABEL=${FS_LABEL:-ephemeral-data}
