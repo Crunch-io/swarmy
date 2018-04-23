@@ -29,7 +29,8 @@ if [ ! -d /root/.swarmy ]; then
     mkdir /root/.swarmy/
 fi
 
-export SWARMYDIR=/root/.swarmy/
+#none of the stage2 scripts expect a trailing slash
+export SWARMYDIR=/root/.swarmy
 
 if [ -z "$DEBUG" ]; then
     # If we aren't debugging, we just want to have stdout/stderr be redirect to
