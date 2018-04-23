@@ -67,6 +67,7 @@ function is_formatted() {
 
     # Look at fstab
     if grep -q LABEL=$FS_LABEL /etc/fstab; then
+        #TODO: This will happen if we stop/start an instance
         echo "The mount point LABEL=$FS_LABEL is already listed in /etc/fstab"
         exit 1
     fi
