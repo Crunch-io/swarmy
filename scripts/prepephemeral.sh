@@ -91,7 +91,12 @@ else
 
     # Look at mdadm.conf
     if grep -q $MDDEV /etc/mdadm.conf; then
-        echo "The device $MDDEV is already configured in mdadm.conf. This script is a no-op."
+        if [ ! -b $MDDEV ]; then
+            # TODO Need to undo the mdadm.conf change because we're broken. This happens if we stop/start our instance
+            echo "The device $MDDEV does not exist, but is is configured in mdadm.conf. Requires intervention to fix. Cowardly refusing to continue."
+        else
+            echo "The device $MDDEV is already configured in mdadm.conf. This script is a no-op."
+        fi
     elif [ -b $MDDEV ]; then
         echo "The device $MDDEV already exists, but is not configured in mdadm.conf. Requires intervention to fix. Cowardly refusing to continue."
         exit 2

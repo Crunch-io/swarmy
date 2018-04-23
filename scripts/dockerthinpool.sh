@@ -57,11 +57,12 @@ EOF
 
     echo "Created scratch space"
 
-    echo -n "/dev/mapper/$VGNAME-scratch" > $SWARMYDIR/ephemeraldev
 else
     echo "Physical volume already exists on: $DEVICE"
     echo "Doing nothing."
 fi
+#Need to alter the ephemeraldev name or it won't be reentrant
+echo -n "/dev/mapper/$VGNAME-scratch" > $SWARMYDIR/ephemeraldev
 
 touch $SWARMYDIR/dockerthinpool.run
 
