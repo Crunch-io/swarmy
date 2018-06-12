@@ -39,9 +39,11 @@ function get_ephemeral_disks {
 
 	# This is a hard coded list. :'(
     case $itype in
-      r3.8xlarge|c3.*|m3.xlarge|m3.2xlarge)
+      #2 xvd* devices
+      r3.8xlarge|c3.*|m3.xlarge|m3.2xlarge|m2.4xlarge)
         DEVICES+=('xvdc');&
-      r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|m3.medium|m3.large)
+      #1 xvd* devices
+      r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|m3.medium|m3.large|m2.2xlarge)
         DEVICES+=('xvdb')
         ;;
       i3.16xlarge)
