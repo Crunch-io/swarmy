@@ -48,11 +48,11 @@ function get_ephemeral_disks {
         ;;
       i3.16xlarge)
         DEVICES+=('nvme4n1' 'nvme5n1' 'nvme6n1' 'nvme7n1');&
-      i3.8xlarge)
+      i3.8xlarge|m5d.24xlarge)
         DEVICES+=('nvme2n1' 'nvme3n1');&
-      i3.4xlarge)
+      i3.4xlarge|m5d.12xlarge|m5d.4xlarge)
         DEVICES+=('nvme1n1');&
-      i3.large|i3.xlarge|i3.2xlarge)
+      i3.large|i3.xlarge|i3.2xlarge|m5d.2xlarge|m5d.xlarge|m5d.large)
         DEVICES+=('nvme0n1')
         ;;
     esac
