@@ -48,12 +48,20 @@ function get_ephemeral_disks {
         ;;
       i3.16xlarge)
         DEVICES+=('nvme4n1' 'nvme5n1' 'nvme6n1' 'nvme7n1');&
-      i3.8xlarge|m5d.24xlarge)
+      i3.8xlarge)
         DEVICES+=('nvme2n1' 'nvme3n1');&
-      i3.4xlarge|m5d.12xlarge|m5d.4xlarge)
+      i3.4xlarge)
         DEVICES+=('nvme1n1');&
-      i3.large|i3.xlarge|i3.2xlarge|m5d.2xlarge|m5d.xlarge|m5d.large)
+      i3.large|i3.xlarge|i3.2xlarge)
         DEVICES+=('nvme0n1')
+        ;;
+      #ENA enabled/SR-IOV where EBS volumes are listed as nvme drives
+      m5d.24xlarge)
+        DEVICES+=('nvme4n1', 'nvme3n1');&
+      m5d.4xlarge|m5d.12xlarge)
+        DEVICES+=('nvme2n1');&
+      m5d.large|m5d.xlarge|m5d.2xlarge)
+        DEVICES+=('nvme1n1')
         ;;
     esac
 
