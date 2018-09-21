@@ -84,7 +84,9 @@ get_ephemeral_disks $INSTANCE_TYPE
 NUM_DEVICES=${#DEVICES[@]}
 MDDEV=
 
-if [ "$NUM_DEVICES" -eq 1 ]; then
+if [ "$NUM_DEVICES" -lt 1 ]; then
+    echo "No ephemeral devices available"
+elif [ "$NUM_DEVICES" -eq 1 ]; then
     # If we only have a single device, we just move on
     MDDEV=/dev/${DEVICES}
     echo "We only found a single device. No further work necessary"
@@ -133,8 +135,7 @@ else
     fi
 fi
 
-if [ -n "$MDDEV" ]; then
-    echo -n "$MDDEV" > $SWARMYDIR/ephemeraldev
-fi
+#Write out ephemeraldev even if blank
+echo -n "$MDDEV" > $SWARMYDIR/ephemeraldev
 touch $SWARMYDIR/prepephemeral.run
 

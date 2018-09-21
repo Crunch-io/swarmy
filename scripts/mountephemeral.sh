@@ -36,7 +36,6 @@ fi
 
 DEVICE=$(cat $SWARMYDIR/ephemeraldev)
 
-
 function is_mounted() {
     thing=$1
     mount | grep -q "$thing"
@@ -51,48 +50,50 @@ function is_formatted() {
     return $?
 }
 
-#Precondition checks: Make sure we haven't been run
-(
-    #Check to make sure we don't already have stuff mounted
-    if is_mounted "$DEVICE"; then
-        echo "The mount device $DEVICE is already mounted"
+if [ -n "$DEVICE" ]; then
+    #Precondition checks: Make sure we haven't been run
+    (
+        #Check to make sure we don't already have stuff mounted
+        if is_mounted "$DEVICE"; then
+            echo "The mount device $DEVICE is already mounted"
+            exit 1
+        fi
+
+        # Look at mount point to make sure nothing's mounted
+        if is_mounted "$MOUNTPOINT"; then
+            echo "The mount point $MOUNTPOINT is already in use"
+            exit 1
+        fi
+
+        # Look at fstab
+        if grep -q LABEL=$FS_LABEL /etc/fstab; then
+            echo "The mount point LABEL=$FS_LABEL is already listed in /etc/fstab"
+            exit 1
+        fi
+    )
+
+    if [ -n "$FORCE" ] || ! is_formatted $DEVICE $FS_TYPE; then
+        mkfs.$FS_TYPE -L $FS_LABEL $FS_OPTIONS $DEVICE
+        if [ -n "$TUNE2FS_OPTIONS" ]; then
+            tune2fs $TUNE2FS_OPTIONS $DEVICE
+        fi
+    fi
+
+    # mount via LABEL not device name, in case it changes
+    echo LABEL=$FS_LABEL $MOUNTPOINT $FS_TYPE defaults,nofail,noatime,discard 0 2 >> /etc/fstab
+
+    if [ ! -d $MOUNTPOINT ]; then
+        mkdir -p $MOUNTPOINT
+    fi
+
+    #Mount it
+    mount $MOUNTPOINT
+
+    #Assert that it's mounted
+    if ! is_mounted "$MOUNTPOINT"; then
+        echo "The mount point $MOUNTPOINT did not come up, aborting"
         exit 1
     fi
-
-    # Look at mount point to make sure nothing's mounted
-    if is_mounted "$MOUNTPOINT"; then
-        echo "The mount point $MOUNTPOINT is already in use"
-        exit 1
-    fi
-
-    # Look at fstab
-    if grep -q LABEL=$FS_LABEL /etc/fstab; then
-        echo "The mount point LABEL=$FS_LABEL is already listed in /etc/fstab"
-        exit 1
-    fi
-)
-
-if [ -n "$FORCE" ] || ! is_formatted $DEVICE $FS_TYPE; then
-    mkfs.$FS_TYPE -L $FS_LABEL $FS_OPTIONS $DEVICE
-    if [ -n "$TUNE2FS_OPTIONS" ]; then
-        tune2fs $TUNE2FS_OPTIONS $DEVICE
-    fi
-fi
-
-# mount via LABEL not device name, in case it changes
-echo LABEL=$FS_LABEL $MOUNTPOINT $FS_TYPE defaults,nofail,noatime,discard 0 2 >> /etc/fstab
-
-if [ ! -d $MOUNTPOINT ]; then
-    mkdir -p $MOUNTPOINT
-fi
-
-#Mount it
-mount $MOUNTPOINT
-
-#Assert that it's mounted
-if ! is_mounted "$MOUNTPOINT"; then
-    echo "The mount point $MOUNTPOINT did not come up, aborting"
-    exit 1
 fi
 
 touch $SWARMYDIR/mountephemeral.run
