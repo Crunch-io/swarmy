@@ -7,6 +7,7 @@ for i in ${USER_ARGS[@]} ; do
       cat $tmpfile >> /home/$i/.ssh/authorized_keys
     else
         echo "User $i Not Found"
-	rm -f $tmpfile
     fi
 done
+#remove the tmpfile
+rm -f $tmpfile
