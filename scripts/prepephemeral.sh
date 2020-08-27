@@ -53,7 +53,9 @@ function get_ephemeral_disks {
       i3.4xlarge)
         DEVICES+=('nvme1n1');&
       i3.large|i3.xlarge|i3.2xlarge)
-        DEVICES+=('nvme0n1')
+        DEVICES+=('nvme0n1');&
+      i3en.xlarge)
+        DEVICES+=('nvme1n1')
         ;;
       #ENA enabled/SR-IOV where EBS volumes are listed as nvme drives
       m5d.24xlarge)
