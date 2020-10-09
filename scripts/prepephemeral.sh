@@ -41,29 +41,37 @@ function get_ephemeral_disks {
     case $itype in
       #2 xvd* devices
       r3.8xlarge|c3.*|m3.xlarge|m3.2xlarge|m2.4xlarge)
-        DEVICES+=('xvdc');&
+        DEVICES+=('xvdc')
+        ;;
       #1 xvd* devices
       r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|m3.medium|m3.large|m2.2xlarge)
         DEVICES+=('xvdb')
         ;;
       i3.16xlarge)
-        DEVICES+=('nvme4n1' 'nvme5n1' 'nvme6n1' 'nvme7n1');&
+        DEVICES+=('nvme4n1' 'nvme5n1' 'nvme6n1' 'nvme7n1')
+        ;;
       i3.8xlarge)
-        DEVICES+=('nvme2n1' 'nvme3n1');&
+        DEVICES+=('nvme2n1' 'nvme3n1')
+        ;;
       i3.4xlarge)
-        DEVICES+=('nvme1n1');&
+        DEVICES+=('nvme1n1')
+        ;;
       i3.large|i3.xlarge|i3.2xlarge)
-        DEVICES+=('nvme0n1');&
+        DEVICES+=('nvme0n1')
+        ;;
       i3en.xlarge)
-        DEVICES+=('nvme1n1');&
+        DEVICES+=('nvme1n1')
+        ;;
       i3en.6xlarge)
         DEVICES+=('nvme1n1' 'nvme2n1')
         ;;
       #ENA enabled/SR-IOV where EBS volumes are listed as nvme drives
       m5d.24xlarge)
-        DEVICES+=('nvme4n1', 'nvme3n1');&
+        DEVICES+=('nvme4n1', 'nvme3n1')
+        ;;
       m5d.4xlarge|m5d.12xlarge)
-        DEVICES+=('nvme2n1');&
+        DEVICES+=('nvme2n1')
+        ;;
       m5d.large|m5d.xlarge|m5d.2xlarge)
         DEVICES+=('nvme1n1')
         ;;
