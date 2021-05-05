@@ -47,6 +47,9 @@ function get_ephemeral_disks {
       r3.large|r3.xlarge|r3.2xlarge|r3.4xlarge|m3.medium|m3.large|m2.2xlarge)
         DEVICES+=('xvdb')
         ;;
+      r5.large)
+        DEVICES+=('nvme1n1')
+        ;;
       i3.16xlarge)
         DEVICES+=('nvme4n1' 'nvme5n1' 'nvme6n1' 'nvme7n1')
         ;;
