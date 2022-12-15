@@ -62,7 +62,7 @@ function get_ephemeral_disks {
       i3.large|i3.xlarge|i3.2xlarge)
         DEVICES+=('nvme0n1')
         ;;
-      i3en.xlarge)
+      i3en.xlarge|i3en.large)
         DEVICES+=('nvme1n1')
         ;;
       i3en.6xlarge)
