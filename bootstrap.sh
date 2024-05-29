@@ -60,8 +60,11 @@ virtualenv VENV
 . VENV/bin/activate
 
 # This allows pinning pip/setuptools from your own PyPI repo
-pip install $PIP_ARGS -U pip
-pip install $PIP_ARGS -U setuptools
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org $PIP_ARGS -U pip
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org $PIP_ARGS -U setuptools
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org boto
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org awscli
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org docopt
 
 if [ ! -d swarmy ]
 then
@@ -79,9 +82,6 @@ then
     rm -f swarmy.tar.gz
 fi
 
-pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pip boto
-pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pip awscli
-pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org docopt
 pip install $PIP_ARGS -e swarmy
 
 function download_next
