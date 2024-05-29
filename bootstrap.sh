@@ -79,6 +79,9 @@ then
     rm -f swarmy.tar.gz
 fi
 
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pip boto
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org pip awscli
+pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org docopt
 pip install $PIP_ARGS -e swarmy
 
 function download_next
