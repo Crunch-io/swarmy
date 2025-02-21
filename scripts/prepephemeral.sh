@@ -30,8 +30,9 @@ if [ -z "$SWARMYDIR" ]; then
     exit 1
 fi
 
+TOKEN=$(curl -s --request PUT "http://169.254.169.254/latest/api/token" --header "X-aws-ec2-metadata-token-ttl-seconds: 3600")
 function get_metadata {
-    curl -s http://169.254.169.254$1
+    curl -s http://169.254.169.254$1 --header "X-aws-ec2-metadata-token: $TOKEN"
 }
 
 function get_ephemeral_disks {
