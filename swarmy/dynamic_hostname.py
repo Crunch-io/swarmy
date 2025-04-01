@@ -109,9 +109,6 @@ def gen_fqdn(config: HostnameConfig) -> str:
 
     Returns:
         str: Generated FQDN
-
-    Raises:
-        ValueError: If IP is invalid or numparts is out of range
     """
     if config.numparts >= 1:
         host_ip_part = '-'.join(config.ip.split('.')[0-config.numparts:])
