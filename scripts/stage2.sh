@@ -5,7 +5,7 @@ if [ -n "$DEBUG" ]; then
 fi
 
 # First, let's deal with the hostname:
-dynamic_hostname $HOSTNAME_ARGS
+dynamic_hostname $HOSTNAME_ARGS || echo "this needs to succeed regardless"
 
 ### TODO: do this, or write a util.py
 #if [ -n "$JENKINS_BASE" ]; then
