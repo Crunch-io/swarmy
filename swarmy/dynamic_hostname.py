@@ -30,7 +30,7 @@ Options:
   --domain-tag=<domain_tag>
                 Instance tag name to use to retrieve name. Overrides --domain
   --hosted-zone=<hosted_zone>
-                By default, we try to add the hostname to the zone name found using --domain or --domain-tag, but if this is different for you, specify this parameter. Ignored if --no-dns is specified
+                By default, we try to add the hostname to the zone name found using --domain or --domain-tag, but if this isdifferent for you, specify this parameter. Ignored if --no-dns is specified
   --prefix=<prefix>
                 The hostname prefix to use. Will be used verbatim (no '-' will be appended). E.g., 'ip' will become 'ip10-2-3-4' and 'ip-' will become 'ip-10-2-3-4' [default: ip-]
   --prefix-tag=<prefix_tag>
@@ -44,7 +44,7 @@ Options:
 
 from typing import Optional, Dict, Any, Union
 from dataclasses import dataclass
-import lib
+from swarmy import lib, _version
 from docopt import docopt
 import sys
 
@@ -60,7 +60,7 @@ class HostnameConfig:
     sep: str = ''
 
 @lib.metadata_required
-def get_ip(public: bool = False) -> str:
+def get_ip(public: bool = False) -> Optional[str]:
     """
     Get the current ip address (private by default)
 
@@ -71,8 +71,8 @@ def get_ip(public: bool = False) -> str:
         str: IP address
     """
     if public:
-        return lib._metadata.get('public-ipv4', '169.254.0.1')
-    return lib._metadata.get('local-ipv4')
+        return lib._metadata_cache['public-ipv4', '169.254.0.1']
+    return lib._metadata_cache['privateIp']
 
 @lib.instance_tags_required
 def get_domain_from_tags(tagName: str) -> Optional[str]:
@@ -85,7 +85,7 @@ def get_domain_from_tags(tagName: str) -> Optional[str]:
     Returns:
         Optional[str]: Domain name if found, None otherwise
     """
-    return lib._tags.get(tagName)
+    return lib._tags_cache(tagName)
 
 @lib.instance_tags_required
 def get_prefix_from_tags(tagName: str) -> Optional[str]:
@@ -98,14 +98,14 @@ def get_prefix_from_tags(tagName: str) -> Optional[str]:
     Returns:
         Optional[str]: Prefix if found, None otherwise
     """
-    return lib._tags.get(tagName)
+    return lib._tags_cache(tagName)
 
 def gen_fqdn(config: HostnameConfig) -> str:
     """
-    Generate FQDN from configuration
+    Generate FQDN from configuration with proper IP part handling
 
     Args:
-        config: HostnameConfig instance containing all necessary parameters
+        config: HostnameConfig with ip, domain, numparts, prefix, and sep
 
     Returns:
         str: Generated FQDN
@@ -115,11 +115,11 @@ def gen_fqdn(config: HostnameConfig) -> str:
     else:
         host_ip_part = ""
 
-    return f"{config.prefix}{config.sep}{host_ip_part}.{config.domain}"
+    return f"{config.prefix}{host_ip_part}.{config.domain}"
 
 def parse_arguments() -> Dict[str, Any]:
     """Parse and validate command line arguments"""
-    return docopt(helpstr, version=f"dynamic_hostname {lib.version}")
+    return docopt(helpstr, version=f"dynamic_hostname {_version.version}")
 
 def get_numparts(arguments: Dict[str, Any]) -> int:
     """Determine number of IP parts to use"""
